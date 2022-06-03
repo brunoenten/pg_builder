@@ -4,5 +4,4 @@ require_relative "pg_builder/version"
 
 module PgBuilder
   class Error < StandardError; end
-  # Your code goes here...
 end
