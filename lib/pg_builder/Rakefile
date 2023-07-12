@@ -6,10 +6,12 @@ require 'erb'
 require 'cucumber'
 require 'cucumber/rake/task'
 
-SRC_PATH = Pathname.new('src')
-TMP_PATH = Pathname.new('tmp')
-BUILD_PATH = Pathname.new('build')
-FEATURES_PATH = Pathname.new('features/schemas')
+APP_PATH = Rake.application.original_dir
+
+SRC_PATH = Pathname.new(File.join(APP_PATH,'src'))
+TMP_PATH = Pathname.new(File.join(APP_PATH,'tmp'))
+BUILD_PATH = Pathname.new(File.join(APP_PATH,'build'))
+FEATURES_PATH = Pathname.new(File.join(APP_PATH,'features/schemas'))
 
 CLEAN.add("#{TMP_PATH}/*.sql")
 CLEAN.add("#{BUILD_PATH}/schema.sql")
