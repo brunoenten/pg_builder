@@ -87,7 +87,7 @@ directory TMP_PATH
 directory BUILD_PATH
 SRC_PATH.each_child { |child| create_task_with_deps(child) }
 
-file 'schema.sql' => [TMP_PATH.to_s, :build] do
+file 'schema.sql' => [TMP_PATH.to_s, BUILD_PATH.to_s] do
   # Create empty placeholder so that cat never fails
   sh "touch #{TMP_PATH}/empty_placeholder"
 
