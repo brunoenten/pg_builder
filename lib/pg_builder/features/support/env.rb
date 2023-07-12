@@ -52,7 +52,7 @@ postgres_container.start
 
 tries = 0
 while PG::Connection.ping(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo') != PG::PQPING_OK do
-  raise "Exceeded connections tentatives to postgres" if tries > 5
+  raise "Exceeded connection attempts to postgres" if tries > 5
   tries += 1
   sleep(1)
 end
