@@ -3,15 +3,15 @@ require 'pg'
 
 Before do
   pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo')
-  pg.exec("CREATE DATABASE testdb")
+  pg.exec('CREATE DATABASE testdb')
   pg.close
   @pg = PG.connect(dbname: 'testdb', host: '127.0.0.1', port: '45432', user: 'proluceo')
 end
 
-After do |scenario|
+After do |_scenario|
   @pg.close
   pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo')
-  pg.exec("DROP DATABASE testdb")
+  pg.exec('DROP DATABASE testdb')
   pg.close
   Rake::Task.tasks.each(&:reenable)
 end

@@ -9,7 +9,7 @@ require 'cucumber/rake/task'
 SRC_PATH = Pathname.new('src')
 TMP_PATH = Pathname.new('tmp')
 BUILD_PATH = Pathname.new('build')
-FEATURES_PATH=Pathname.new('features/schemas')
+FEATURES_PATH = Pathname.new('features/schemas')
 
 CLEAN.add("#{TMP_PATH}/*.sql")
 CLEAN.add("#{BUILD_PATH}/schema.sql")
@@ -17,17 +17,17 @@ CLEAN.add("#{BUILD_PATH}/schema.sql")
 @sequence = 0
 def add_source(filepath)
   filename = filepath.each_filename.to_a.join('_')
-  FileUtils.ln_s(filepath.relative_path_from(TMP_PATH), TMP_PATH + "#{@sequence.to_s.rjust(10,'0')}-#{filename}")
+  FileUtils.ln_s(filepath.relative_path_from(TMP_PATH), TMP_PATH + "#{@sequence.to_s.rjust(10, '0')}-#{filename}")
   @sequence += 1
 end
 
 def create_task_with_deps(path)
-  task_fqn = ""
+  task_fqn = ''
   if path.file? and path.extname == '.sql'
     filepath_wo_ext = Pathname.new(path.relative_path_from(SRC_PATH).to_s[..-5])
     task_fqn = filepath_wo_ext.each_filename.to_a.join(':')
     if Rake::Task.task_defined?(task_fqn)
-      #puts "Task #{task_fqn} already exists. Skipping"
+      # puts "Task #{task_fqn} already exists. Skipping"
       return task_fqn
     end
 
@@ -42,19 +42,18 @@ def create_task_with_deps(path)
     # Parse deps metadata
     File.open(path) do |f|
       matches = /-- depends_on: (\[.*\])/.match(f.gets)
-      if !matches.nil?
+      unless matches.nil?
         dependencies = JSON.parse(matches[1])
         deps_fqn = dependencies.map do |dep|
           dep_path = File.join(dep.split(':'))
           base_path = if dep[0..1] == '::'
-            SRC_PATH
-          else
-            path.dirname
-          end
-          dep_fullpath = Pathname.new(File.join(base_path,dep.split(':').reject(&:empty?)) + '.sql')
-          if !dep_fullpath.exist?
-            raise "Cannot find dependency #{dep_fullpath}"
-          end
+                        SRC_PATH
+                      else
+                        path.dirname
+                      end
+          dep_fullpath = Pathname.new(File.join(base_path, dep.split(':').reject(&:empty?)) + '.sql')
+          raise "Cannot find dependency #{dep_fullpath}" unless dep_fullpath.exist?
+
           create_task_with_deps(dep_fullpath)
         end
       end
@@ -62,32 +61,31 @@ def create_task_with_deps(path)
     t = Rake::Task.define_task(task_fqn.to_sym => deps_fqn) do
       add_source(path)
     end
-    #puts "Defined task '#{t}' with deps #{deps_fqn}"
+    # puts "Defined task '#{t}' with deps #{deps_fqn}"
 
   elsif path.directory?
     task_fqn = path.relative_path_from(SRC_PATH).each_filename.to_a.join(':')
     task_fqn += ':all'
     if Rake::Task.task_defined?(task_fqn)
-      #puts "Task #{task_fqn} already exists. Skipping"
+      # puts "Task #{task_fqn} already exists. Skipping"
       return task_fqn
     end
+
     # Create files tasks first
     deps = path.children.select(&:file?).map { |child| create_task_with_deps(child) }
     deps += path.children.select(&:directory?).map { |child| create_task_with_deps(child) }
     t = Rake::Task.define_task(task_fqn.to_sym => deps)
-    #puts "Defined task '#{t}' with deps #{deps}"
-  else
-    #puts "Ignoring file #{path}"
+    # puts "Defined task '#{t}' with deps #{deps}"
   end
 
-  return task_fqn
+  task_fqn
 end
 
 directory TMP_PATH
 directory BUILD_PATH
 SRC_PATH.each_child { |child| create_task_with_deps(child) }
 
-file 'schema.sql' => [:tmp, :build] do
+file 'schema.sql' => %i[tmp build] do
   # Create empty placeholder so that cat never fails
   sh "touch #{TMP_PATH}/empty_placeholder"
 
@@ -99,35 +97,35 @@ file 'schema.sql' => [:tmp, :build] do
   @sequence = 0
 end
 
-
 ## Testing
 def generate_cucumber_features(spec)
   FileUtils.rm_r(FEATURES_PATH) if FEATURES_PATH.exist?
-  Rake::Task.tasks().each do |task|
+  Rake::Task.tasks.each do |task|
     nodes = task.name.split(':')
-    if nodes.include?('tables')
-      table_name= nodes[-1]
-      next if table_name == 'all'
-      schema_name = nodes[1]
+    next unless nodes.include?('tables')
 
-      template = ERB.new(File.read(File.join(spec.gem_dir, 'lib', 'pg_builder', 'features', 'templates', 'table.feature.erb')))
-      dirpath = FileUtils.mkpath(File.join(['features'] + nodes[0..-2]))
-      File.open(File.join(dirpath, table_name + '.feature'), 'w') { |f| f.write(template.result(binding)) }
-    end
+    table_name = nodes[-1]
+    next if table_name == 'all'
+
+    schema_name = nodes[1]
+
+    template = ERB.new(File.read(File.join(spec.gem_dir, 'lib', 'pg_builder', 'features', 'templates',
+                                           'table.feature.erb')))
+    dirpath = FileUtils.mkpath(File.join(['features'] + nodes[0..-2]))
+    File.write(File.join(dirpath, table_name + '.feature'), template.result(binding))
   end
 end
 
 Cucumber::Rake::Task.new(:features) do |t|
-  t.cucumber_opts = "--require --format pretty" # Any valid command line option can go here.
+  t.cucumber_opts = '--require --format pretty' # Any valid command line option can go here.
 end
 
-task :cucumber => [:init, 'schema.sql'] do
+task cucumber: [:init, 'schema.sql'] do
   spec = Gem::Specification.find_by_name 'pg_builder'
   generate_cucumber_features(spec)
   sh "cucumber --require features --require #{File.join(spec.gem_dir, 'lib', 'pg_builder', 'features')}"
 end
 
-task init: [:clean, :tmp, :"roles:all"]
-task complete: [:init, :"schemas:all", :"permissions", 'schema.sql']
+task init: %i[clean tmp roles:all]
+task complete: [:init, :'schemas:all', :permissions, 'schema.sql']
 task default: [:complete]
-

@@ -5,15 +5,14 @@ require 'pg'
 def execute_build(conn)
   Rake::Task['schema.sql'].invoke
   begin
-    File.open('build/schema.sql', 'r') {|f| conn.exec(f.read)}
+    File.open('build/schema.sql', 'r') { |f| conn.exec(f.read) }
   rescue PG::Error => e
-    puts "Error: " + e.inspect
+    puts 'Error: ' + e.inspect
     raise e
   end
   FileUtils.rm('build/schema.sql')
   Rake::Task.tasks.each(&:reenable)
 end
-
 
 # Init rake
 Rake.load_rakefile('Rakefile')
@@ -40,7 +39,7 @@ postgres_container = Docker::Container.create(
   'ENV' => ['POSTGRES_HOST_AUTH_METHOD=trust'],
   'HostConfig' => {
     'Binds' => [
-      File.expand_path('./empty.nothing') + ":/docker-entrypoint-initdb.d/schema.sql:ro"
+      File.expand_path('./empty.nothing') + ':/docker-entrypoint-initdb.d/schema.sql:ro'
     ],
     'PortBindings' => {
       '5432/tcp' => [{ 'HostPort' => '45432', 'HostIp' => '127.0.0.1' }]
@@ -51,8 +50,9 @@ postgres_container = Docker::Container.create(
 postgres_container.start
 
 tries = 0
-while PG::Connection.ping(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo') != PG::PQPING_OK do
-  raise "Exceeded connection attempts to postgres" if tries > 5
+while PG::Connection.ping(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo') != PG::PQPING_OK
+  raise 'Exceeded connection attempts to postgres' if tries > 5
+
   tries += 1
   sleep(1)
 end
@@ -61,7 +61,6 @@ end
 pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo')
 Rake::Task[:init].invoke && execute_build(pg)
 pg.close
-
 
 at_exit do
   postgres_container.stop
