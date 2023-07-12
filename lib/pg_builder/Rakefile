@@ -92,7 +92,8 @@ file 'schema.sql' => [TMP_PATH.to_s, BUILD_PATH.to_s] do
   sh "touch #{TMP_PATH}/empty_placeholder"
 
   # Merge all generated source files into build
-  sh "cat #{TMP_PATH}/* > #{BUILD_PATH}/schema.sql"
+  # Using awk to insert newline between files
+  sh "awk '{print $0}' #{TMP_PATH}/* > #{BUILD_PATH}/schema.sql"
 
   # Remove generated source files
   rm Dir.glob("#{TMP_PATH}/*")
