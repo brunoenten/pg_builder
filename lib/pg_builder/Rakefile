@@ -6,6 +6,9 @@ require 'erb'
 require 'cucumber'
 require 'cucumber/rake/task'
 
+spec = Gem::Specification.find_by_name 'pg_builder'
+import File.join(spec.gem_dir, 'lib', 'pg_builder', 'tasks', 'generators.rake')
+
 APP_PATH = Rake.application.original_dir
 
 SRC_PATH = Pathname.new(File.join(APP_PATH,'src'))
