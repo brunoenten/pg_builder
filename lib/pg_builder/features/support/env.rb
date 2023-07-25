@@ -36,7 +36,7 @@ postgres_container = Docker::Container.create(
   'name' => 'testdb',
   'Image' => docker_image.id,
   'ExposedPorts' => { '5432/tcp' => {} },
-  'ENV' => ['POSTGRES_HOST_AUTH_METHOD=trust', 'LANG=C.UTF-8'],
+  'ENV' => ['POSTGRES_HOST_AUTH_METHOD=trust'],
   'HostConfig' => {
     'Binds' => [
       File.expand_path('./empty.nothing') + ':/docker-entrypoint-initdb.d/schema.sql:ro'
