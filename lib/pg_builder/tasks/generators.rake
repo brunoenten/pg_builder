@@ -18,8 +18,7 @@ namespace :generate do
     # Schema creation file
     spec = Gem::Specification.find_by_name 'pg_builder'
     template = ERB.new(File.read(File.join(spec.gem_dir, 'lib', 'pg_builder', 'templates', 'schema.sql.erb')))
-    path_to_create = File.join(schema_root, args.schema_name + '.sql')
-    puts path_to_create
+    path_to_create = File.join(APP_PATH,'src', 'schemas', args.schema_name + '.sql')
     File.write(path_to_create, template.result(binding))
   end
 end

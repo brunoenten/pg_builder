@@ -1,8 +1,8 @@
-FROM postgres:14
+FROM postgres:15
 #ADD initdb.sql /docker-entrypoint-initdb.d
 
-ENV POSTGRES_USER=proluceo PGUSER=proluceo
-ENV PGPASSWD=choucroute POSTGRES_PASSWORD=choucroute
+ENV POSTGRES_USER=builder PGUSER=builder
+ENV PGPASSWD=builder POSTGRES_PASSWORD=builder
 ENV PGDATA=/var/lib/postgresql/data/pgdata
 
 ADD install.sh /install.sh
