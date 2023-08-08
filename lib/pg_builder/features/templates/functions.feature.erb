@@ -1,0 +1,5 @@
+Feature: Function <%= schema_name %>.<%= element_name %>
+  Scenario: Function should exists
+    Given the sql path '<%= task.name %>'
+    Then the function '<%= schema_name %>.<%= element_name %>' should exists
+

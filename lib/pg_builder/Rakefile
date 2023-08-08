@@ -108,21 +108,23 @@ def generate_cucumber_features(spec)
   FileUtils.rm_r(FEATURES_PATH) if FEATURES_PATH.exist?
   Rake::Task.tasks.each do |task|
     nodes = task.name.split(':')
-    next unless nodes.include?('tables')
+    # Only tables and functions are currently supported
+    element_type = (nodes & ['tables', 'functions']).first
+    next unless element_type
 
-    table_name = nodes[-1]
-    next if table_name == 'all'
+    element_name = nodes[-1]
+    next if element_name == 'all'
 
     schema_name = nodes[1]
 
     template = ERB.new(File.read(File.join(spec.gem_dir, 'lib', 'pg_builder', 'features', 'templates',
-                                           'table.feature.erb')))
+                                           "#{element_type}.feature.erb")))
     dirpath = FileUtils.mkpath(File.join(['features'] + nodes[0..-2]))
-    File.write(File.join(dirpath, table_name + '.feature'), template.result(binding))
+    File.write(File.join(dirpath, element_name + '.feature'), template.result(binding))
   end
 end
 
-task :cucumber do
+task cucumber: [TMP_PATH.to_s, BUILD_PATH.to_s] do
   spec = Gem::Specification.find_by_name 'pg_builder'
   generate_cucumber_features(spec)
   sh "echo > #{BUILD_PATH}/schema.sql"
