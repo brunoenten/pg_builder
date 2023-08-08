@@ -2,15 +2,20 @@ require 'rake'
 require 'pg'
 
 Before do
-  pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo')
+  Rake::Task[:reset].invoke
+  pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: POSTGRES_USER)
   pg.exec('CREATE DATABASE testdb')
   pg.close
-  @pg = PG.connect(dbname: 'testdb', host: '127.0.0.1', port: '45432', user: 'proluceo')
+  @pg = PG.connect(dbname: 'testdb', host: '127.0.0.1', port: '45432', user: POSTGRES_USER)
+  if EXTENSION_SCHEMA
+    # Create schema if testing extension
+    @pg.exec("CREATE SCHEMA #{EXTENSION_SCHEMA}")
+  end
 end
 
 After do |_scenario|
   @pg.close
-  pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: 'proluceo')
+  pg = PG.connect(dbname: 'postgres', host: '127.0.0.1', port: '45432', user: POSTGRES_USER)
   pg.exec('DROP DATABASE testdb')
   pg.close
   Rake::Task.tasks.each(&:reenable)

@@ -122,10 +122,16 @@ def generate_cucumber_features(spec)
   end
 end
 
-task cucumber: [:init, 'schema.sql'] do
+task :cucumber do
   spec = Gem::Specification.find_by_name 'pg_builder'
   generate_cucumber_features(spec)
+  sh "echo > #{BUILD_PATH}/schema.sql"
   sh "cucumber --require features --require #{File.join(spec.gem_dir, 'lib', 'pg_builder', 'features')}"
+end
+
+task :reset do
+  rm Dir.glob("#{TMP_PATH}/*")
+  @sequence = 0
 end
 
 task init: [:clean, TMP_PATH.to_s, 'roles:all']
