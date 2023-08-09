@@ -119,7 +119,7 @@ def generate_cucumber_features(spec)
 
     template = ERB.new(File.read(File.join(spec.gem_dir, 'lib', 'pg_builder', 'features', 'templates',
                                            "#{element_type}.feature.erb")))
-    dirpath = FileUtils.mkpath(File.join(['features'] + nodes[0..-2]))
+    dirpath = FileUtils.mkpath(File.join([FEATURES_PATH] + nodes[0..-2]))
     File.write(File.join(dirpath, element_name + '.feature'), template.result(binding))
   end
 end
