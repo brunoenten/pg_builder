@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'docker-api', '~> 2.2'
   spec.add_dependency 'pg', '~> 1.2'
   spec.add_dependency 'rake', '~> 13.0'
+  spec.add_dependency 'rspec-expectations', '~> 3.12'
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

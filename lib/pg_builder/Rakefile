@@ -14,7 +14,7 @@ APP_PATH = Rake.application.original_dir
 SRC_PATH = Pathname.new(File.join(APP_PATH,'src'))
 TMP_PATH = Pathname.new(File.join(APP_PATH,'tmp'))
 BUILD_PATH = Pathname.new(File.join(APP_PATH,'build'))
-FEATURES_PATH = Pathname.new(File.join(APP_PATH,'features/schemas'))
+FEATURES_PATH = Pathname.new(File.join(APP_PATH,'features','schemas', 'generated'))
 
 CLEAN.add("#{TMP_PATH}/*.sql")
 CLEAN.add("#{BUILD_PATH}/schema.sql")
