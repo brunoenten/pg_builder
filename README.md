@@ -1,21 +1,33 @@
 # PgBuilder
 
+PgBuilder is a Ruby gem designed to simplify the management and deployment of PostgreSQL database objects. 
+It organizes your SQL scripts into a structured directory and uses Rake tasks to manage roles, schemas, tables, 
+functions, and more in your PostgreSQL projects.
+
+## Features
+
+- **Organized Structure**: Organize your database objects (roles, schemas, tables, functions, sequences) in a clear and manageable hierarchy.
+- **Rake Integration**: Leverage Rake tasks to automate the deployment and management of SQL resources.
+- **Extensible Design**: Customize and extend the structure to fit your project's needs.
+
 ## Installation
 
-Install using rubygems:
+Install PgBuilder using RubyGems:
 
-    $ gem install pg_builder
+```bash
+$ gem install pg_builder
+```
 
 ## Usage
 
-Create a file name Rakefile at the root of your project, containing these lines
+1. Create a file named `Rakefile` at the root of your project with the following content:
 ```ruby
     require 'pg_builder'
     spec = Gem::Specification.find_by_name 'pg_builder'
     load "#{spec.gem_dir}/lib/Rakefile"
 ```
 
-Organize your code with the following tree as an example:
+2. Organize your code with the following tree as an example:
 
 ```
 project_root
@@ -64,21 +76,42 @@ File src/schemas/schema_a/table_a.sql
   --depends_on: ['::schemas:schema_a:types:type_a', '::schemas:schema_a:sequences:sequence_a', 'table_b']
 ```
 
-To build the schema, just run rake with no argument
-To run tests, run cucumber with no argument
+3. To build the schema, just run rake with no argument
+   
+4. To run tests, run cucumber with no argument
 
+## Directory Structure
 
+The default structure encourages modular and reusable SQL components. You can organize objects by roles, schemas, and specific types (tables, functions, etc.).
 
-## Development
+- `roles/`: Contains role definitions.
+- `schemas/`: Contains schemas and their associated objects, such as tables, functions, and sequences.
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+## Example
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Here’s an example of deploying a new schema with tables and functions:
+
+1. Create a new schema directory under `src/schemas/`.
+2. Add SQL scripts for tables and functions in the appropriate subdirectories.
+3. Run the build task:
+   ```bash
+   $ rake
+   ```
+
+PgBuilder will process the SQL scripts in the specified order and apply them to the database.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pg_builder.
+We welcome contributions! If you have ideas, bug fixes, or enhancements, please fork the repository and submit a pull request.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License. See the [LICENSE.txt](LICENSE.txt) file for details.
+
+## Acknowledgments
+
+Special thanks to the PostgreSQL community for their continuous support and inspiration for tools like this.
+
+---
+
+*Note: This tool is a community-driven project and is not officially affiliated with the PostgreSQL Global Development Group.*
